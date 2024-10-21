@@ -1,0 +1,45 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - database
+    networks:
+      - todoapp_network
+
+  database:
+    image: mysql:lts
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: todo_app_db
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - todoapp_network
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"
+    depends_on:
+      - database
+    environment:
+      PMA_ARBITRARY: 1
+      PMA_HOST: database
+    networks:
+      - todoapp_network
+
+volumes:
+  db_data:
+
+networks:
+  todoapp_network:
